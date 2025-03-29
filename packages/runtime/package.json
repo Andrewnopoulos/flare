@@ -1,0 +1,27 @@
+{
+    "name": "@flare/runtime",
+    "version": "0.1.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build:wasm": "cd wasm && mkdir -p build && cd build && emcmake cmake .. && emmake make",
+        "build:ts": "tsc",
+        "build": "npm run build:wasm && npm run build:ts",
+        "dev": "webpack serve --mode development",
+        "clean": "rm -rf dist wasm/build",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@flare/file-format": "^0.1.0",
+        "@flare/shared": "^0.1.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.0.0",
+        "html-webpack-plugin": "^5.0.0",
+        "ts-jest": "^29.0.0"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": ""
+}
