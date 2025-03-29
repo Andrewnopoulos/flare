@@ -1,3 +1,27 @@
+
+// Add this at the top of the file
+declare global {
+    interface Window {
+        FlareWasmModule: any;
+    }
+}
+  
+// Replace the import with a more browser-friendly approach
+async function loadWasmModule() {
+try {
+    // Try dynamic import first
+    const module = await import('./wasm/flare_runtime.js');
+    return module.default;
+} catch (e) {
+    console.error('Failed to load WebAssembly module:', e);
+    // Fallback to global
+    if (window.FlareWasmModule) {
+    return window.FlareWasmModule;
+    }
+    throw new Error('WebAssembly module not found');
+}
+}
+
 // Type definitions for the WebAssembly module
 interface FlareWasmModule {
     cwrap: <T extends Function>(name: string, returnType: string | null, argTypes: (string | null)[]) => T;
@@ -50,12 +74,10 @@ interface FlareWasmModule {
     // Initialize the module
     public async initialize(canvasId: number, width: number, height: number): Promise<void> {
       if (this.initialized) return;
-  
+
       try {
-        // Load the WebAssembly module
-        // Note: The actual path might need adjustment based on your build setup
-        const FlareWasmModule = await import('./wasm/flare_runtime.js');
-        this.module = await FlareWasmModule.default();
+        const moduleFactory = await loadWasmModule();
+        this.module = await moduleFactory();
   
         // Wrap the C functions
         this.functions = {

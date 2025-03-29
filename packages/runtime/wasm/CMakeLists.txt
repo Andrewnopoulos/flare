@@ -11,6 +11,7 @@ set(CMAKE_EXECUTABLE_SUFFIX ".js")
 include_directories(include)
 
 # Export C functions to JavaScript
+# Add this flag to make it browser-compatible
 set(EMSCRIPTEN_LINK_FLAGS 
     "-s WASM=1 \
      -s EXPORTED_RUNTIME_METHODS=['cwrap','ccall'] \
@@ -18,6 +19,8 @@ set(EMSCRIPTEN_LINK_FLAGS
      -s ALLOW_MEMORY_GROWTH=1 \
      -s MODULARIZE=1 \
      -s EXPORT_NAME='FlareWasmModule' \
+     -s ENVIRONMENT='web' \
+     -s FILESYSTEM=0 \
      --no-entry")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EMSCRIPTEN_LINK_FLAGS}")

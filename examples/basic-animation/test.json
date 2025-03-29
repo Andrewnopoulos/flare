@@ -1,0 +1,80 @@
+{
+    "version": "1.0",
+    "frameRate": 60,
+    "duration": 180,
+    "dimensions": {
+      "width": 600,
+      "height": 400,
+      "responsive": true
+    },
+    "layers": [
+      {
+        "id": "background",
+        "type": "normal",
+        "locked": false,
+        "visible": true,
+        "frames": [
+          {
+            "startFrame": 0,
+            "duration": 180,
+            "elements": [
+              {
+                "id": "bg1",
+                "type": "rectangle",
+                "properties": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 600,
+                  "height": 400,
+                  "fill": "#f0f0f0"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "animation",
+        "type": "normal",
+        "locked": false,
+        "visible": true,
+        "frames": [
+          {
+            "startFrame": 0,
+            "duration": 180,
+            "elements": [
+              {
+                "id": "circle1",
+                "type": "circle",
+                "properties": {
+                  "x": 100,
+                  "y": 200,
+                  "radius": 50,
+                  "fill": "#ff3366"
+                },
+                "animations": [
+                  {
+                    "property": "x",
+                    "keyframes": [
+                      { "frame": 0, "value": 100, "easing": "ease-in-out" },
+                      { "frame": 60, "value": 500, "easing": "ease-in-out" },
+                      { "frame": 120, "value": 100, "easing": "ease-in-out" }
+                    ]
+                  },
+                  {
+                    "property": "radius",
+                    "keyframes": [
+                      { "frame": 0, "value": 50, "easing": "ease-in-out" },
+                      { "frame": 90, "value": 80, "easing": "ease-in-out" },
+                      { "frame": 180, "value": 50, "easing": "ease-in-out" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "scripts": []
+  }

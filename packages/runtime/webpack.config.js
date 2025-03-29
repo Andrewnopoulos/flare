@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: './src/index.ts',
@@ -19,8 +20,15 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     alias: {
-      '@flare': path.resolve(__dirname, '../../packages/'),
+      // Fix package resolution for monorepo
+      '@flare/shared': path.resolve(__dirname, '../shared/src'),
+      '@flare/file-format': path.resolve(__dirname, '../file-format/src'),
     },
+    // Handle Node.js built-in modules
+    fallback: {
+      "fs": false,
+      "path": false,
+    }
   },
   output: {
     filename: 'bundle.js',
@@ -32,6 +40,10 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
+    }),
+    // Add Node.js environment variables
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('development')
     }),
   ],
   devServer: {
