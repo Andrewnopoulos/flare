@@ -4,6 +4,21 @@ import { FlarePlayer, FlarePlayerOptions } from './player';
 export { FlarePlayer };
 export type { FlarePlayerOptions };
 
+// Create namespace for UMD build
+declare global {
+  interface Window {
+    flare: {
+      FlarePlayer: typeof FlarePlayer;
+    };
+  }
+}
+
+// Expose to window for UMD build
+if (typeof window !== 'undefined') {
+  window.flare = window.flare || {};
+  window.flare.FlarePlayer = FlarePlayer;
+}
+
 // Create a simple HTML file for testing
 export const createTestHTML = (): string => {
   return `

@@ -6,36 +6,72 @@ declare global {
     }
 }
   
+// Type for module factory function
+type WasmModuleFactory = () => Promise<FlareWasmModule>;
+
 // Replace the import with a more browser-friendly approach
-async function loadWasmModule() {
+async function loadWasmModule(): Promise<WasmModuleFactory> {
 try {
     // For debugging
-    console.log('Loading WebAssembly module from /wasm directory...');
+    console.log('Loading WebAssembly module...');
     
-    // Import the WebAssembly module from the src/wasm directory
-    const module = await import('./wasm/flare_runtime.js');
-    console.log('Module imported successfully:', module);
+    // Create a script element to load the WebAssembly module
+    const wasmScriptUrl = '/wasm/flare_runtime.js';
     
-    // Set location of wasm file for module in the src/wasm directory
-    const wasmUrl = new URL('./wasm/flare_runtime.wasm', import.meta.url).href;
-    console.log('WASM URL:', wasmUrl);
-    
-    // Use locateFile to help emscripten find the wasm file
-    const modFactory = module.default;
-    return () => modFactory({
-      locateFile: function(path: string, prefix: string): string {
-        if (path.endsWith('.wasm')) {
-          return wasmUrl;
-        }
-        return prefix + path;
+    // Return a promise that resolves when the script is loaded
+    return new Promise<WasmModuleFactory>((resolve, reject) => {
+      // Check if FlareWasmModule is already defined
+      if (window.FlareWasmModule) {
+        console.log('FlareWasmModule already loaded, using existing instance');
+        // Create a factory function that returns the module
+        const factory = () => {
+          return Promise.resolve(window.FlareWasmModule({
+            locateFile: (path: string) => {
+              if (path.endsWith('.wasm')) {
+                return '/wasm/flare_runtime.wasm';
+              }
+              return path;
+            }
+          }));
+        };
+        resolve(factory);
+        return;
       }
+      
+      // Load the WebAssembly JavaScript loader
+      const script = document.createElement('script');
+      script.src = wasmScriptUrl;
+      script.async = true;
+      
+      script.onload = () => {
+        console.log('WebAssembly script loaded');
+        // When the script is loaded, return a factory function
+        if (window.FlareWasmModule) {
+          // Create a factory function that returns the module
+          const factory = () => {
+            return Promise.resolve(window.FlareWasmModule({
+              locateFile: (path: string) => {
+                if (path.endsWith('.wasm')) {
+                  return '/wasm/flare_runtime.wasm';
+                }
+                return path;
+              }
+            }));
+          };
+          resolve(factory);
+        } else {
+          reject(new Error('FlareWasmModule not found after script load'));
+        }
+      };
+      
+      script.onerror = () => {
+        reject(new Error(`Failed to load WebAssembly script from ${wasmScriptUrl}`));
+      };
+      
+      document.head.appendChild(script);
     });
 } catch (e: unknown) {
     console.error('Failed to load WebAssembly module:', e);
-    // Fallback to global
-    if (window.FlareWasmModule) {
-      return window.FlareWasmModule;
-    }
     const errorMessage = e instanceof Error ? e.message : 'Unknown error';
     throw new Error('WebAssembly module not found: ' + errorMessage);
 }

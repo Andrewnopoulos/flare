@@ -6,7 +6,8 @@
     "scripts": {
         "build:wasm": "cd wasm && mkdir -p build && cd build && emcmake cmake .. && emmake make",
         "build:ts": "tsc",
-        "build": "npm run build:wasm && npm run build:ts",
+        "build:webpack": "webpack --mode development",
+        "build": "npm run build:wasm && npm run build:ts && npm run build:webpack",
         "dev": "webpack serve --mode development",
         "clean": "rm -rf dist wasm/build",
         "test": "jest"

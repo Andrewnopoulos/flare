@@ -60,24 +60,26 @@
     <button id="stop-btn">Stop</button>
   </div>
 
-  <script type="module">
-    // Import the FlarePlayer from the runtime package
-    import { FlarePlayer } from './bundle.js';
-    
-    // Initialize player when DOM is ready
+  <script>
+    // Wait for DOM and script to be ready
     document.addEventListener('DOMContentLoaded', () => {
-      const player = new FlarePlayer({
-        container: '#flare-container',
-        source: 'test.json',
-        autoplay: true,
-        onReady: () => console.log('Flare player ready'),
-        onError: (err) => console.error('Flare player error:', err)
-      });
-      
-      // Connect control buttons
-      document.querySelector('#play-btn').addEventListener('click', () => player.play());
-      document.querySelector('#pause-btn').addEventListener('click', () => player.pause());
-      document.querySelector('#stop-btn').addEventListener('click', () => player.stop());
+      // Access the FlarePlayer from the global scope (UMD bundle)
+      if (window.flare && window.flare.FlarePlayer) {
+        const player = new window.flare.FlarePlayer({
+          container: '#flare-container',
+          source: 'test.json',
+          autoplay: true,
+          onReady: () => console.log('Flare player ready'),
+          onError: (err) => console.error('Flare player error:', err)
+        });
+        
+        // Connect control buttons
+        document.querySelector('#play-btn').addEventListener('click', () => player.play());
+        document.querySelector('#pause-btn').addEventListener('click', () => player.pause());
+        document.querySelector('#stop-btn').addEventListener('click', () => player.stop());
+      } else {
+        console.error('FlarePlayer not loaded properly');
+      }
     });
   </script>
 </body>

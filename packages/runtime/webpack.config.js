@@ -35,13 +35,15 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     library: {
-      type: 'module'
-    }
+      type: 'umd',
+      umdNamedDefine: true
+    },
+    globalObject: 'this'
   },
   experiments: {
-    asyncWebAssembly: true,
-    outputModule: true
+    asyncWebAssembly: true
   },
+  devtool: 'source-map',
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
@@ -53,6 +55,7 @@ module.exports = {
     // Copy WebAssembly files and example animation to dist
     new CopyPlugin({
       patterns: [
+        { from: 'src/wasm/flare_runtime.js', to: 'wasm/flare_runtime.js' },
         { from: 'src/wasm/flare_runtime.wasm', to: 'wasm/flare_runtime.wasm' },
         { from: '../../examples/basic-animation/test.json', to: 'test.json' }
       ],
