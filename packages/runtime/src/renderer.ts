@@ -120,9 +120,23 @@ export class FlareRenderer {
    * Resize the renderer
    */
   public resize(width: number, height: number): void {
+    console.log(`Resizing renderer to ${width}x${height}`);
+    
+    // Update canvas dimensions in JavaScript
+    // This will be redundant with the WebAssembly resize, but ensures compatibility
     this.canvas.width = width;
     this.canvas.height = height;
+    
+    // Update canvas style properties
+    this.canvas.style.width = `${width}px`;
+    this.canvas.style.height = `${height}px`;
+    
+    // Call the WebAssembly resize function
+    // This will update the internal WebAssembly state and the canvas dimensions
     this.wasmRenderer.resize(width, height);
+    
+    // Clear the canvas after resize to prevent artifacts
+    this.wasmRenderer.clear();
   }
 
   /**

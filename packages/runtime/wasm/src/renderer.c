@@ -109,9 +109,32 @@ EMSCRIPTEN_KEEPALIVE void renderer_draw_circle(RendererHandle renderer,
     js_draw_circle(renderer->canvas_id, x, y, radius, fill_color);
 }
 
+// JavaScript function to resize the canvas
+EM_JS(void, js_resize_canvas, (int canvas_id, double width, double height), {
+    const canvas = document.getElementById('canvas-' + canvas_id);
+    if (!canvas) {
+        console.error('Canvas not found for resize: canvas-' + canvas_id);
+        return;
+    }
+    
+    console.log('WASM resizing canvas to:', width, 'x', height);
+    
+    // Update canvas dimensions
+    canvas.width = width;
+    canvas.height = height;
+    
+    // Update canvas style dimensions to match
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+});
+
 void renderer_resize(RendererHandle renderer, double width, double height) {
     if (!renderer) return;
+    
+    // Update the renderer's internal dimensions
     renderer->width = width;
     renderer->height = height;
-    // Note: We'd typically resize the canvas here as well
+    
+    // Resize the actual canvas element
+    js_resize_canvas(renderer->canvas_id, width, height);
 }

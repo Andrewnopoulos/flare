@@ -1248,6 +1248,7 @@ function js_get_canvas_context(canvas_id,width,height) { let canvas = document.g
 function js_clear_canvas(canvas_id,width,height) { const ctx = window.flareCanvasContexts[canvas_id]; if (ctx) { ctx.clearRect(0, 0, width, height); } }
 function js_draw_rectangle(canvas_id,x,y,width,height,fill_color) { const ctx = window.flareCanvasContexts[canvas_id]; if (ctx) { ctx.fillStyle = UTF8ToString(fill_color); ctx.fillRect(x, y, width, height); } }
 function js_draw_circle(canvas_id,x,y,radius,fill_color) { const ctx = window.flareCanvasContexts[canvas_id]; if (ctx) { ctx.fillStyle = UTF8ToString(fill_color); ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); } }
+function js_resize_canvas(canvas_id,width,height) { const canvas = document.getElementById('canvas-' + canvas_id); if (!canvas) { console.error('Canvas not found for resize: canvas-' + canvas_id); return; } console.log('WASM resizing canvas to:', width, 'x', height); canvas.width = width; canvas.height = height; canvas.style.width = width + 'px'; canvas.style.height = height + 'px'; }
 var wasmImports = {
   /** @export */
   _abort_js: __abort_js,
@@ -1266,7 +1267,9 @@ var wasmImports = {
   /** @export */
   js_draw_rectangle,
   /** @export */
-  js_get_canvas_context
+  js_get_canvas_context,
+  /** @export */
+  js_resize_canvas
 };
 var wasmExports = await createWasm();
 var ___wasm_call_ctors = createExportWrapper('__wasm_call_ctors', 0);

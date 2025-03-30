@@ -88,7 +88,7 @@ export class FlarePlayer {
           fill: '#ff00ff'
         }
       }]);
-
+      
       // Load source
       await this.loadSource(this.options.source);
       
