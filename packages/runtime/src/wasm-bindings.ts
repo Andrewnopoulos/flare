@@ -178,19 +178,53 @@ interface FlareWasmModule {
     private createCString(str: string): number {
       if (!this.module) return 0;
       
+      // Get the length of the string and allocate memory
       const strLen = str.length + 1; // +1 for null terminator
       const ptr = this.module._malloc(strLen);
       
-      // This won't work directly - we'd need a proper way to write to memory
-      // For simplicity, we're glossing over the details of writing to WebAssembly memory
-      // In a real implementation, use TextEncoder and write to the memory buffer
+      // Convert string to UTF8 and write to memory
+      const stringToUTF8 = (str: string, outPtr: number, maxBytesToWrite: number): void => {
+        if (!this.module) return;
+        
+        // Access the HEAPU8 array from the module
+        const HEAPU8 = new Uint8Array((this.module as any).HEAPU8.buffer);
+        
+        // Convert and write the string one character at a time
+        let outIdx = outPtr;
+        for (let i = 0; i < str.length; ++i) {
+          const u = str.charCodeAt(i);
+          if (u <= 0x7F) {
+            HEAPU8[outIdx++] = u;
+          } else if (u <= 0x7FF) {
+            HEAPU8[outIdx++] = 0xC0 | (u >> 6);
+            HEAPU8[outIdx++] = 0x80 | (u & 63);
+          } else if (u <= 0xFFFF) {
+            HEAPU8[outIdx++] = 0xE0 | (u >> 12);
+            HEAPU8[outIdx++] = 0x80 | ((u >> 6) & 63);
+            HEAPU8[outIdx++] = 0x80 | (u & 63);
+          } else {
+            console.warn("Character outside of BMP not supported in string encoding");
+          }
+          
+          // Check to make sure we don't write beyond maxBytesToWrite
+          if (outIdx >= outPtr + maxBytesToWrite - 1) break;
+        }
+        
+        // Null termination
+        HEAPU8[outIdx] = 0;
+      };
       
+      // Encode the string to UTF8 and write it to memory
+      stringToUTF8(str, ptr, strLen);
+      
+      console.log(`Created C string: "${str}" at address ${ptr}`);
       return ptr;
     }
   
     // Helper to free a C string
     private freeCString(ptr: number): void {
       if (!this.module) return;
+      console.log(`Freeing C string at address ${ptr}`);
       this.module._free(ptr);
     }
   

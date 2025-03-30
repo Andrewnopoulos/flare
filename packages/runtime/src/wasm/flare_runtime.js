@@ -1244,7 +1244,7 @@ async function createWasm() {
 function checkIncomingModuleAPI() {
   ignoredModuleProp('fetchSettings');
 }
-function js_get_canvas_context(canvas_id,width,height) { let canvas = document.getElementById('canvas-' + canvas_id); if (!canvas) { console.error('Canvas not found: canvas-' + canvas_id); return 0; } canvas.width = width; canvas.height = height; if (!window.flareCanvasContexts) { window.flareCanvasContexts = {}; } window.flareCanvasContexts[canvas_id] = canvas.getContext('2d'); return 1; }
+function js_get_canvas_context(canvas_id,width,height) { let canvas = document.getElementById('canvas-' + canvas_id); if (!canvas) { console.error('Canvas not found: canvas-' + canvas_id); return 0; } console.log('WASM found canvas element:', 'canvas-' + canvas_id, canvas); canvas.width = width; canvas.height = height; if (!window.flareCanvasContexts) { window.flareCanvasContexts = {}; } const ctx = canvas.getContext('2d'); window.flareCanvasContexts[canvas_id] = ctx; ctx.fillStyle = 'purple'; ctx.fillRect(10, 10, 50, 50); console.log('WASM drew test pattern on canvas'); return 1; }
 function js_clear_canvas(canvas_id,width,height) { const ctx = window.flareCanvasContexts[canvas_id]; if (ctx) { ctx.clearRect(0, 0, width, height); } }
 function js_draw_rectangle(canvas_id,x,y,width,height,fill_color) { const ctx = window.flareCanvasContexts[canvas_id]; if (ctx) { ctx.fillStyle = UTF8ToString(fill_color); ctx.fillRect(x, y, width, height); } }
 function js_draw_circle(canvas_id,x,y,radius,fill_color) { const ctx = window.flareCanvasContexts[canvas_id]; if (ctx) { ctx.fillStyle = UTF8ToString(fill_color); ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); } }

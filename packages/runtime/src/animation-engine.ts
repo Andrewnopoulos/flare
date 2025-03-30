@@ -88,18 +88,32 @@ export class AnimationEngine {
   public getCurrentElements(): Element[] {
     const elements: Element[] = [];
     
+    // Debug current frame
+    console.log('Current frame:', this.currentFrame);
+    console.log('Timeline layers:', this.timeline.layers.length);
+    
     // For each layer
     for (const layer of this.timeline.layers) {
-      if (!layer.visible) continue;
+      if (!layer.visible) {
+        console.log('Skipping invisible layer:', layer.id);
+        continue;
+      }
+      
+      console.log('Processing layer:', layer.id, 'with', layer.frames.length, 'frames');
       
       // Find the active frame for this layer at the current time
       const activeFrame = this.findActiveFrame(layer);
       if (activeFrame) {
+        console.log('Found active frame with', activeFrame.elements.length, 'elements');
         // Apply any animations to the elements
         const animatedElements = this.applyAnimations(activeFrame.elements, activeFrame);
         elements.push(...animatedElements);
+      } else {
+        console.log('No active frame found for layer', layer.id);
       }
     }
+    
+    console.log('Total elements to render:', elements.length);
     
     return elements;
   }

@@ -1,4 +1,4 @@
-import { Timeline } from '@flare/shared';
+import { ElementType, Timeline } from '@flare/shared';
 import { FlareParser } from '@flare/file-format';
 import { FlareRenderer } from './renderer';
 import { AnimationEngine } from './animation-engine';
@@ -74,6 +74,20 @@ export class FlarePlayer {
       // Create renderer
       this.renderer = new FlareRenderer(this.container, this.width, this.height);
       await this.renderer.initialize();
+      
+      // Test the renderer directly to make sure it's working
+      console.log('Testing renderer directly...');
+      this.renderer.render([{
+        id: 'test-rect',
+        type: ElementType.RECTANGLE,
+        properties: {
+          x: 20,
+          y: 20,
+          width: 100,
+          height: 50,
+          fill: '#ff00ff'
+        }
+      }]);
 
       // Load source
       await this.loadSource(this.options.source);
@@ -113,6 +127,7 @@ export class FlarePlayer {
    */
   private async loadSource(source: string): Promise<void> {
     try {
+      console.log('Loading source:', source);
       const response = await fetch(source);
       if (!response.ok) {
         throw new Error(`Failed to load source: ${response.statusText}`);
@@ -121,9 +136,27 @@ export class FlarePlayer {
       // For now, we're expecting JSON directly
       // In a full implementation, we'd handle binary .flare files
       const json = await response.json();
+      console.log('Loaded JSON data:', json);
       
       // Parse the timeline
       this.timeline = FlareParser.parseJSON(JSON.stringify(json));
+      console.log('Parsed timeline:', this.timeline);
+      
+      // Debug check - inspect the timeline properties
+      if (this.timeline) {
+        console.log('Timeline details:',
+          'frameRate:', this.timeline.frameRate,
+          'duration:', this.timeline.duration,
+          'layers:', this.timeline.layers.length
+        );
+        
+        // Check first frame of first layer
+        if (this.timeline.layers.length > 0 && 
+            this.timeline.layers[0].frames.length > 0 &&
+            this.timeline.layers[0].frames[0].elements.length > 0) {
+          console.log('First element:', this.timeline.layers[0].frames[0].elements[0]);
+        }
+      }
     } catch (error) {
       console.error('Failed to load source:', error);
       throw error;

@@ -13,6 +13,8 @@ EM_JS(void, js_get_canvas_context, (int canvas_id, int width, int height), {
         return 0;
     }
     
+    console.log('WASM found canvas element:', 'canvas-' + canvas_id, canvas);
+    
     // Set the canvas dimensions
     canvas.width = width;
     canvas.height = height;
@@ -21,7 +23,14 @@ EM_JS(void, js_get_canvas_context, (int canvas_id, int width, int height), {
     if (!window.flareCanvasContexts) {
         window.flareCanvasContexts = {};
     }
-    window.flareCanvasContexts[canvas_id] = canvas.getContext('2d');
+    
+    const ctx = canvas.getContext('2d');
+    window.flareCanvasContexts[canvas_id] = ctx;
+    
+    // Draw a test pattern to verify the context is working
+    ctx.fillStyle = 'purple';
+    ctx.fillRect(10, 10, 50, 50);
+    console.log('WASM drew test pattern on canvas');
     
     return 1;
 });
