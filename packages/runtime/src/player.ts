@@ -1,7 +1,7 @@
 import { ElementType, Timeline } from '@flare/shared';
 import { FlareParser } from '@flare/file-format';
 import { FlareRenderer } from './renderer';
-import { AnimationEngine } from './animation-engine';
+import { AnimationEngine } from './animation/animation-engine';
 
 export interface FlarePlayerOptions {
   container: HTMLElement | string;
