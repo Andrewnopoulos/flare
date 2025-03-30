@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/index.ts',
@@ -33,9 +34,13 @@ module.exports = {
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    library: {
+      type: 'module'
+    }
   },
   experiments: {
     asyncWebAssembly: true,
+    outputModule: true
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -44,6 +49,13 @@ module.exports = {
     // Add Node.js environment variables
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
+    }),
+    // Copy WebAssembly files and example animation to dist
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/wasm/flare_runtime.wasm', to: 'wasm/flare_runtime.wasm' },
+        { from: '../../examples/basic-animation/test.json', to: 'test.json' }
+      ],
     }),
   ],
   devServer: {

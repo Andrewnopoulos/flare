@@ -9,16 +9,35 @@ declare global {
 // Replace the import with a more browser-friendly approach
 async function loadWasmModule() {
 try {
-    // Try dynamic import first
+    // For debugging
+    console.log('Loading WebAssembly module from /wasm directory...');
+    
+    // Import the WebAssembly module from the src/wasm directory
     const module = await import('./wasm/flare_runtime.js');
-    return module.default;
-} catch (e) {
+    console.log('Module imported successfully:', module);
+    
+    // Set location of wasm file for module in the src/wasm directory
+    const wasmUrl = new URL('./wasm/flare_runtime.wasm', import.meta.url).href;
+    console.log('WASM URL:', wasmUrl);
+    
+    // Use locateFile to help emscripten find the wasm file
+    const modFactory = module.default;
+    return () => modFactory({
+      locateFile: function(path: string, prefix: string): string {
+        if (path.endsWith('.wasm')) {
+          return wasmUrl;
+        }
+        return prefix + path;
+      }
+    });
+} catch (e: unknown) {
     console.error('Failed to load WebAssembly module:', e);
     // Fallback to global
     if (window.FlareWasmModule) {
-    return window.FlareWasmModule;
+      return window.FlareWasmModule;
     }
-    throw new Error('WebAssembly module not found');
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    throw new Error('WebAssembly module not found: ' + errorMessage);
 }
 }
 

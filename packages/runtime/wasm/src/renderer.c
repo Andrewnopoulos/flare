@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <emscripten.h>
+#include <emscripten/console.h>
 #include "renderer.h"
 
 // HTML5 Canvas API functions we'll call from JavaScript
@@ -91,7 +92,7 @@ void renderer_draw_rectangle(RendererHandle renderer,
     js_draw_rectangle(renderer->canvas_id, x, y, width, height, fill_color);
 }
 
-void renderer_draw_circle(RendererHandle renderer, 
+EMSCRIPTEN_KEEPALIVE void renderer_draw_circle(RendererHandle renderer, 
                          double x, double y, 
                          double radius, 
                          const char* fill_color) {

@@ -31,3 +31,7 @@
 - Implement graceful degradation for runtime errors
 - Log performance issues without breaking execution
 - Validate inputs for rendering and animation functions
+
+## Additional Requests
+- Don't run npm or git commands unless explicitly asked to by name
+- Don't run bash commands which execute npm run commands
